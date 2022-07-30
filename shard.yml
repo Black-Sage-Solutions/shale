@@ -1,0 +1,21 @@
+name: Shale
+version: 2022.7
+
+authors:
+  - Jared Smith <jared.smith.jrod@gmail.com>
+
+crystal: ">=1.5.0"
+
+description: |
+  My software renderer project
+
+dependencies:
+  x11:
+    github: jrods/x11-cr
+    branch: develop
+
+license: MPL-2.0
+
+targets:
+  Shale:
+    main: src/shale.cr

@@ -1,0 +1,37 @@
+{
+	"folders":
+	[
+		{
+			"path": ".",
+		}
+	],
+	"debugger_configurations":
+	[
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Launch",
+			"program": "${folder}/bin/Shale",
+			"args": [],
+			"cwd": "${folder}",
+		},
+		{
+			"type": "gdb",
+			"request": "launch",
+			"name": "Launch Program",
+			"target": "${workspaceRoot}/bin/Shale",
+			"cwd": "${workspaceRoot}",
+			"valuesFormatting": "parseText",
+		},
+	],
+	"settings":
+	{
+		"LSP":
+		{
+			"crystalline":
+			{
+				"enabled": true
+			}
+		}
+	},
+}
