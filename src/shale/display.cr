@@ -8,7 +8,6 @@ module Shale
     @frame_buffer : Shale::FrameBuffer
     @gc : X11::C::X::GC
     @img : X11::Image
-    # @pixmap : X11::C::Pixmap
     @window : X11::C::Window
     @window_attr : X11::SetWindowAttributes
 
@@ -38,17 +37,11 @@ module Shale
       default_depth = @display.default_depth screen
       default_gc = @display.default_gc screen
       black_pix = @display.black_pixel screen
-      white_pix = @display.white_pixel screen
-
-      value_mask = X11::C::CWBackPixel | X11::C::CWBorderPixel | X11::C::CWEventMask | X11::C::CWWinGravity
 
       @window_attr = X11::SetWindowAttributes.new
-      @window_attr.background_pixel = black_pix
-      @window_attr.border_pixel = black_pix
       @window_attr.event_mask = X11::ButtonMotionMask | X11::ButtonPressMask | X11::ButtonReleaseMask |
                                 X11::ExposureMask | X11::KeyPressMask | X11::KeyReleaseMask |
                                 X11::StructureNotifyMask
-
       @window = @display.create_window(
         parent: root_win,
         x: 0,
@@ -59,16 +52,19 @@ module Shale
         depth: X11::C::CopyFromParent.to_i32,
         c_class: X11::C::CopyFromParent.to_u32,
         visual: visual,
-        valuemask: value_mask,
+        valuemask: X11::C::CWBackPixel | X11::C::CWBorderPixel | X11::C::CWEventMask,
         attributes: @window_attr
       )
 
-      @display.set_foreground default_gc, white_pix
+      @display.set_foreground default_gc, black_pix
+
       @display.store_name @window, title
+
       # Sets the window's close button to actually quit
       @wm_delete_window = @display.intern_atom "WM_DELETE_WINDOW", false
       @display.set_wm_protocols @window, [wm_delete_window]
-      @display.map_raised @window # apparently maps and puts the window to the top of the stack, but im not sure what that results in
+
+      @display.map_raised @window
 
       @frame_buffer = FrameBuffer.new @width, @height
 
@@ -84,14 +80,6 @@ module Shale
         bytes_per_line: (@width * sizeof(UInt32)).to_i32, # Consider creating a color type
       )
 
-      # For images, don't think it's necessary to draw to a pixmap
-      # @pixmap = @display.create_pixmap(
-      #   d: @window,
-      #   width: @width,
-      #   height: @height,
-      #   depth: default_depth.to_u32,
-      # )
-
       gc_values_struct = uninitialized X11::C::X::GCValues
       gc_values = X11::GCValues.new pointerof(gc_values_struct)
 
@@ -99,9 +87,6 @@ module Shale
       @gc = @display.create_gc d: @window, valuemask: 0_u64, values: gc_values
 
       @display.set_graphics_exposures @gc, true
-
-      # @display.flush
-      # @display.sync true
     end
 
     # Close and clean up the X11 display
@@ -119,8 +104,6 @@ module Shale
     # ### Description
     #
     def draw(&block : Shale::FrameBuffer -> Nil)
-      # TODO: look into if needing to clear drawables in x11
-
       @frame_buffer.clear
 
       yield @frame_buffer
