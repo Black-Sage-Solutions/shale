@@ -4,6 +4,17 @@ require "time"
 require "x11"
 
 module Shale
+  struct Stats
+    property cycles : UInt64 = 0_u64
+    property last_draw_time_ms : Float64 = 0_f64
+    property last_time_left_s : Float64 = 0_f64
+    property total_draw_time_s : Float64 = 0_f64
+
+    def average_draw_time : Float64
+      total_draw_time_s / cycles
+    end
+  end
+
   def self.main
     puts "Starting..."
 
@@ -12,8 +23,8 @@ module Shale
 
     stars = Shale::Stars3D.new 4096, 60_f32, 5_f32
 
-    cycles = 0_u64
     prev_time = Time.monotonic
+    stats = uninitialized Stats
     quit = false
 
     loop do
@@ -25,8 +36,6 @@ module Shale
         e = d.next_event
         # pp e
         case e
-        when X11::NoExposeEvent
-        when X11::ExposeEvent
         when X11::ClientMessageEvent
           if e.long_data[0] == d.wm_delete_window
             quit = true
@@ -35,6 +44,7 @@ module Shale
         when X11::ConfigureEvent
           if d.width != e.width.to_u32 || d.height != e.height.to_u32
             d.resize e.width.to_u32, e.height.to_u32
+            break
           end
         when X11::KeyEvent
           pp e.lookup_string
@@ -51,19 +61,25 @@ module Shale
 
       results = Benchmark.measure "Draw Time" do
         d.draw do |frame|
+          frame.clear 0x77_u8
           stars.render target: frame, delta: delta
           # TestDrawing.test_true_colour target: frame
         end
       end
 
-      p "#{results.label}: #{results.total * 1000}ms"
+      # p "#{results.label}: #{results.total * 1000}ms"
 
-      cycles += 1
+      stats.cycles += 1
+      stats.last_draw_time_ms = results.total * 1_000
+      stats.last_time_left_s = ((1 / 60) - delta)
+      stats.total_draw_time_s += results.total
 
-      sleep 1 / 60
+      p stats
+
+      sleep stats.last_time_left_s if stats.last_time_left_s > 0
     end
 
-    p "cycles: #{cycles}"
+    p "Avg Draw Time: #{stats.average_draw_time}s"
 
     d.close
     0
