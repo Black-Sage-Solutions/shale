@@ -124,6 +124,8 @@ module Shale
       @frame_buffer.clear
 
       yield @frame_buffer
+
+      self.swap_buffer
     end
 
     # Cleanup garbage collection method

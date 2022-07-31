@@ -26,9 +26,7 @@ module Shale
         # pp e
         case e
         when X11::NoExposeEvent
-          break
         when X11::ExposeEvent
-          break
         when X11::ClientMessageEvent
           if e.long_data[0] == d.wm_delete_window
             quit = true
@@ -54,10 +52,9 @@ module Shale
       results = Benchmark.measure "Draw Time" do
         d.draw do |frame|
           stars.render target: frame, delta: delta
+          # TestDrawing.test_true_colour target: frame
         end
       end
-
-      d.swap_buffer
 
       p "#{results.label}: #{results.total * 1000}ms"
 
