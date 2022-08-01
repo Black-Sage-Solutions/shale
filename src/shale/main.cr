@@ -24,7 +24,7 @@ module Shale
     stars = Shale::Stars3D.new 4096, 60_f32, 5_f32
 
     prev_time = Time.monotonic
-    stats = uninitialized Stats
+    stats = Stats.new
     quit = false
 
     loop do
@@ -34,7 +34,6 @@ module Shale
 
       while d.pending > 0
         e = d.next_event
-        # pp e
         case e
         when X11::ClientMessageEvent
           if e.long_data[0] == d.wm_delete_window
@@ -63,11 +62,8 @@ module Shale
         d.draw do |frame|
           frame.clear 0x77_u8
           stars.render target: frame, delta: delta
-          # TestDrawing.test_true_colour target: frame
         end
       end
-
-      # p "#{results.label}: #{results.total * 1000}ms"
 
       stats.cycles += 1
       stats.last_draw_time_ms = results.total * 1_000
@@ -79,7 +75,7 @@ module Shale
       sleep stats.last_time_left_s if stats.last_time_left_s > 0
     end
 
-    p "Avg Draw Time: #{stats.average_draw_time}s"
+    p "Avg Draw Time: #{stats.average_draw_time * 1_000}ms"
 
     d.close
     0

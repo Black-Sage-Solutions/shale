@@ -1,2 +1,4 @@
 bin
+docs
 lib
+*.sublime-workspace
