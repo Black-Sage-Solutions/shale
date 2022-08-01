@@ -4,15 +4,14 @@ require "./framebuffer"
 
 module Shale
   class Display
+    @default_depth : Int32
+    @default_gc : X11::C::X::GC
     @display : X11::Display
+    @frame : X11::Image
     @frame_buffer : Shale::FrameBuffer
-    @gc : X11::C::X::GC
-    @img : X11::Image
+    @visual : X11::Visual
     @window : X11::C::Window
-    @window_attr : X11::SetWindowAttributes
 
-    getter height
-    getter width
     getter wm_delete_window : X11::C::Atom
 
     # Create a display
@@ -32,31 +31,28 @@ module Shale
       end
 
       screen = @display.default_screen_number
-      visual = @display.default_visual screen # maybe need a copy visual, 1 step part of avoiding flickering on resizing the window
-      root_win = @display.root_window screen
-      default_depth = @display.default_depth screen
-      default_gc = @display.default_gc screen
-      black_pix = @display.black_pixel screen
 
-      @window_attr = X11::SetWindowAttributes.new
-      @window_attr.event_mask = X11::ButtonMotionMask | X11::ButtonPressMask | X11::ButtonReleaseMask |
-                                X11::ExposureMask | X11::KeyPressMask | X11::KeyReleaseMask |
-                                X11::StructureNotifyMask
+      @visual = @display.default_visual screen
+      @default_depth = @display.default_depth screen
+      @default_gc = @display.default_gc screen
+
+      window_attr = X11::SetWindowAttributes.new
+      window_attr.event_mask = X11::ButtonMotionMask | X11::ButtonPressMask | X11::ButtonReleaseMask |
+                               X11::ExposureMask | X11::KeyPressMask | X11::KeyReleaseMask |
+                               X11::StructureNotifyMask
       @window = @display.create_window(
-        parent: root_win,
+        parent: @display.root_window(screen),
         x: 0,
         y: 0,
         width: @width,
         height: @height,
         border_width: 1_u32,
         depth: X11::C::CopyFromParent.to_i32,
-        c_class: X11::C::CopyFromParent.to_u32,
-        visual: visual,
-        valuemask: X11::C::CWBackPixel | X11::C::CWBorderPixel | X11::C::CWEventMask,
-        attributes: @window_attr
+        c_class: X11::C::InputOutput.to_u32,
+        visual: @visual,
+        valuemask: X11::C::CWBorderPixel | X11::C::CWEventMask,
+        attributes: window_attr
       )
-
-      @display.set_foreground default_gc, black_pix
 
       @display.store_name @window, title
 
@@ -68,9 +64,9 @@ module Shale
 
       @frame_buffer = FrameBuffer.new @width, @height
 
-      @img = @display.create_image(
-        visual: visual,
-        depth: default_depth.to_u32,
+      @frame = @display.create_image(
+        visual: @visual,
+        depth: @default_depth.to_u32,
         format: X11::C::ZPixmap,
         offset: 0,
         data: @frame_buffer.data,
@@ -79,14 +75,6 @@ module Shale
         bitmap_pad: 32,
         bytes_per_line: (@width * sizeof(UInt32)).to_i32, # Consider creating a color type
       )
-
-      gc_values_struct = uninitialized X11::C::X::GCValues
-      gc_values = X11::GCValues.new pointerof(gc_values_struct)
-
-      # @gc = @display.create_gc d: @pixmap, valuemask: 0_u64, values: gc_values
-      @gc = @display.create_gc d: @window, valuemask: 0_u64, values: gc_values
-
-      @display.set_graphics_exposures @gc, true
     end
 
     # Close and clean up the X11 display
@@ -105,9 +93,7 @@ module Shale
     #
     def draw(&block : Shale::FrameBuffer -> Nil)
       @frame_buffer.clear
-
       yield @frame_buffer
-
       self.swap_buffer
     end
 
@@ -146,20 +132,16 @@ module Shale
     # `uninitialize` the necessary properties.
     #
     def resize(width : UInt32, height : UInt32)
+      return unless @width != width || @height != height
+
       @height = height
       @width = width
 
-      screen = @display.default_screen_number
-      default_depth = @display.default_depth screen
-      visual = @display.default_visual screen
+      @frame_buffer = Shale::FrameBuffer.new @width, @height
 
-      @img.finalize
-
-      @frame_buffer = Shale::FrameBuffer.new width, height
-
-      @img = @display.create_image(
-        visual: visual,
-        depth: default_depth.to_u32,
+      @frame = @display.create_image(
+        visual: @visual,
+        depth: @default_depth.to_u32,
         format: X11::C::ZPixmap,
         offset: 0,
         data: @frame_buffer.data,
@@ -168,8 +150,6 @@ module Shale
         bitmap_pad: 32,
         bytes_per_line: (@width * sizeof(UInt32)).to_i32,
       )
-
-      self.swap_buffer
 
       @display.sync true
     end
@@ -183,8 +163,8 @@ module Shale
     def swap_buffer
       @display.put_image(
         d: @window,
-        gc: @gc,
-        image: @img,
+        gc: @default_gc,
+        image: @frame,
         src_x: 0,
         src_y: 0,
         dest_x: 0,

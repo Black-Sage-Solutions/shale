@@ -41,10 +41,8 @@ module Shale
             break
           end
         when X11::ConfigureEvent
-          if d.width != e.width.to_u32 || d.height != e.height.to_u32
-            d.resize e.width.to_u32, e.height.to_u32
-            break
-          end
+          d.resize e.width.to_u32, e.height.to_u32
+          break
         when X11::KeyEvent
           pp e.lookup_string
           if e.keycode == 24
@@ -60,7 +58,7 @@ module Shale
 
       results = Benchmark.measure "Draw Time" do
         d.draw do |frame|
-          frame.clear 0x77_u8
+          # frame.clear 0x77_u8
           stars.render target: frame, delta: delta
         end
       end
