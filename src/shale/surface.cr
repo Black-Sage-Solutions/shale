@@ -1,12 +1,12 @@
 module Shale
-  struct FrameBuffer
+  struct Surface
     @data : Bytes
 
     getter data
     getter height
     getter width
 
-    # Create a framebuffer.
+    # Create a surface buffer.
     #
     # ### Arguments
     # - **width**
@@ -22,7 +22,7 @@ module Shale
     end
 
     def inspect(io : IO) : Nil
-      io << "#<FrameBuffer @data.size=\"{{@data.size}}\">"
+      io << "#<Surface @data.size=\"{{@data.size}}\">"
     end
 
     # Clear the buffer.
@@ -37,7 +37,7 @@ module Shale
       @data.fill(shade)
     end
 
-    # Map pixel to the frame
+    # Map pixel to the surface
     #
     # ### Arguments
     # - **x** Horizontal coordinate.
@@ -45,8 +45,8 @@ module Shale
     # - **\*colours** Tuple of colour values, order currently is for BGRA.
     #
     # ### Description
-    # Maps a pixel at the exact coordinate in the frame with the provided colour
-    # channels.
+    # Maps a pixel at the exact coordinate in the surface buffer with the
+    # provided colour channels.
     #
     # There is bounds checking on the incoming parameters, and the mapping of
     # the colours are using `Slice#unsafe_put` method to skip its own bounds

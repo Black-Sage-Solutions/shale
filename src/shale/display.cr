@@ -1,6 +1,6 @@
 require "x11"
 
-require "./framebuffer"
+require "./surface"
 
 module Shale
   class Display
@@ -8,7 +8,7 @@ module Shale
     @default_gc : X11::C::X::GC
     @display : X11::Display
     @frame : X11::Image
-    @frame_buffer : Shale::FrameBuffer
+    @frame_buffer : Shale::Surface
     @visual : X11::Visual
     @window : X11::C::Window
 
@@ -62,7 +62,7 @@ module Shale
 
       @display.map_raised @window
 
-      @frame_buffer = FrameBuffer.new @width, @height
+      @frame_buffer = Surface.new @width, @height
 
       @frame = @display.create_image(
         visual: @visual,
@@ -91,7 +91,7 @@ module Shale
     #
     # ### Description
     #
-    def draw(&block : Shale::FrameBuffer -> Nil)
+    def draw(&block : Shale::Surface -> Nil)
       @frame_buffer.clear
       yield @frame_buffer
       self.swap_buffer
@@ -137,7 +137,7 @@ module Shale
       @height = height
       @width = width
 
-      @frame_buffer = Shale::FrameBuffer.new @width, @height
+      @frame_buffer = Shale::Surface.new @width, @height
 
       @frame = @display.create_image(
         visual: @visual,
@@ -157,7 +157,7 @@ module Shale
     # Swap buffer
     #
     # ### Description
-    # Writes the X11 image, mapped with the framebuffer data, to the window for
+    # Writes the X11 image, mapped with the Surface data, to the window for
     # display.
     #
     def swap_buffer

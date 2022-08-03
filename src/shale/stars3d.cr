@@ -1,6 +1,6 @@
 require "math"
 
-require "./framebuffer"
+require "./surface"
 
 module Shale
   class Stars3D
@@ -32,7 +32,7 @@ module Shale
       @stars_z[i] = self.dist_pos
     end
 
-    def render(target : Shale::FrameBuffer, delta : Float64)
+    def render(target : Shale::Surface, delta : Float64)
       half_width = target.width / 2
       half_height = target.height / 2
 

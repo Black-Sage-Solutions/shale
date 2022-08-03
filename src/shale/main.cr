@@ -58,7 +58,6 @@ module Shale
 
       results = Benchmark.measure "Draw Time" do
         d.draw do |frame|
-          # frame.clear 0x77_u8
           stars.render target: frame, delta: delta
         end
       end
