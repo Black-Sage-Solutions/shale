@@ -37,6 +37,9 @@ module Shale
       @data.fill(shade)
     end
 
+    def clear(colour : UInt32 = 0x0)
+    end
+
     # Map pixel to the surface
     #
     # ### Arguments
@@ -61,20 +64,24 @@ module Shale
     # YCbCr, etc.
     #
     def map_pixel(x : UInt32, y : UInt32, *colours : UInt8)
-      if x > @width
-        raise "Bounds check failed: x (#{x}) is too high (#{@width})."
+      if 1 > x || x > @width
+        # raise "Bounds check failed: x (#{x}) is too high (#{@width})."
+        return
       end
 
-      if y > @height
-        raise "Bounds check failed: y (#{y}) is too high (#{@height})."
+      if 1 > y || y > @height
+        # raise "Bounds check failed: y (#{y}) is too high (#{@height})."
+        return
       end
 
       if colours.size > @channels
         raise "Incoming number of colour channels is too high"
       end
 
-      start = (y * @width + x) * @channels
-      # colours.each_with_index { |e, i| @data[start + i] = e }
+      start = ((y - 1) * @width + (x - 1)) * @channels
+      # The (x - 1) is to fix a graphical error when the framebuffer is
+      # larger than the display window, but not sure if this is the right fix
+
       colours.each_with_index { |e, i| @data.unsafe_put(start + i, e) }
     end
 

@@ -23,6 +23,13 @@ module Shale
     #
     # ### Description
     #
+    #
+    # FIXME: for the x11 pixmap, it seems to be a mismatch by 1 pixel when displaying in the window
+    # example: if the window width (499) is less than the framebuffer width (500) (on the righthand side)
+    # some reason, the last column of pixels in the framebuffer are show on the lefthand side by 1 pixel
+    # UPDATE: temp fix added to the Surface.map_pixel function, but should investigate more if the right
+    # fix is to offset the incoming coords before mapping to the framebuffer
+    #
     def initialize(@width : UInt32, @height : UInt32, title : String)
       @display = X11::Display.new
 
@@ -50,7 +57,7 @@ module Shale
         depth: X11::C::CopyFromParent.to_i32,
         c_class: X11::C::InputOutput.to_u32,
         visual: @visual,
-        valuemask: X11::C::CWBorderPixel | X11::C::CWEventMask,
+        valuemask: (X11::C::CWBorderPixel | X11::C::CWEventMask).to_u64, # these mask bits are defined in x11-cr as i64
         attributes: window_attr
       )
 
@@ -159,6 +166,7 @@ module Shale
     # ### Description
     # Writes the X11 image, mapped with the Surface data, to the window for
     # display.
+    #
     #
     def swap_buffer
       @display.put_image(

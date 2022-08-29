@@ -2,5 +2,5 @@ version: 2.0
 shards:
   x11:
     git: https://github.com/jrods/x11-cr.git
-    version: 1.0.0+git.commit.dcfcdbe68f180fd51bb1e7560a41a20f8eb27154
+    version: 1.0.0+git.commit.39f993fed202d8f5f6f684baca166e35756ab055
 

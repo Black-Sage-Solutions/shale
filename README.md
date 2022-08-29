@@ -31,5 +31,8 @@ Distributed under the Mozilla Public License v2.0 (MPL-2.0). See [LICENSE](./LIC
 
 Here's a list of materials I've used along the way to learning more about the tech needed:
 
-* https://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/
 * https://github.com/tsoding/x11-double-buffering & https://www.youtube.com/watch?v=osnd75j7Wco
+
+Some misc resources discovered that are not in reference for the project, but still useful to keep track of:
+
+* https://www.talisman.org/~erlkonig/misc/x11-composite-tutorial/

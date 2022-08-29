@@ -36,7 +36,7 @@ module Shale
       half_width = target.width / 2
       half_height = target.height / 2
 
-      rad = (90/2)*(Math::PI/180)
+      rad = (90/2)*(Math::PI/180) # deg to rad
       half_fov = Math.tan rad
 
       (0...@num_of_stars).each do |i|
