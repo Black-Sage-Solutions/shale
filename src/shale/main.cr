@@ -20,14 +20,13 @@ module Shale
 
     d = Shale::Display.new(width: 800_u32, height: 600_u32, title: "Shale")
     pp d
+    # stars = Shale::Stars3D.new 4096, 60_f32, 5_f32
 
-    ctx = Shale::RenderCtx.new
+    ctx = Shale::RenderCtx.new 600_u32
 
-    (100_u32..200_u32).each do |j|
-      ctx.set_point j, (300 - j).to_u32, (300 + j).to_u32
-    end
-
-    stars = Shale::Stars3D.new 4096, 60_f32, 5_f32
+    a : Shale::Vertex = {x: 100_f32, y: 100_f32}
+    b : Shale::Vertex = {x: 150_f32, y: 200_f32}
+    c : Shale::Vertex = {x: 80_f32, y: 300_f32}
 
     prev_time = Time.monotonic
     stats = Stats.new
@@ -65,8 +64,8 @@ module Shale
       results = Benchmark.measure "Draw Time" do
         d.draw do |frame|
           # stars.render target: frame, delta: delta
-
-          ctx.draw frame
+          ctx.scan_to_triangle a, b, c, 0
+          ctx.draw frame, 100_u32, 300_u32
         end
       end
 
