@@ -25,7 +25,7 @@ module Shale
     ctx = Shale::RenderCtx.new 600_u32
 
     a : Shale::Vertex = {x: 100_f32, y: 100_f32}
-    b : Shale::Vertex = {x: 150_f32, y: 200_f32}
+    b : Shale::Vertex = {x: 300_f32, y: 200_f32}
     c : Shale::Vertex = {x: 80_f32, y: 300_f32}
 
     prev_time = Time.monotonic
@@ -64,8 +64,9 @@ module Shale
       results = Benchmark.measure "Draw Time" do
         d.draw do |frame|
           # stars.render target: frame, delta: delta
-          ctx.scan_to_triangle a, b, c, 0
-          ctx.draw frame, 100_u32, 300_u32
+          # ctx.scan_to_triangle a, b, c, 0
+          # ctx.draw frame, 100_u32, 300_u32
+          ctx.draw_triangle c, a, b, target: frame
         end
       end
 
