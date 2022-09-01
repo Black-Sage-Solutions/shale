@@ -7,7 +7,7 @@ module Shale::TestDrawing
   # **WARNING** Using this will flicker the screen very rapidly with different
   # colours.
   #
-  def test_seizure(target : Shale::FrameBuffer)
+  def test_seizure(target : Shale::Surface)
     b, g, r = Random.rand(StaticArray(UInt8, 3))
     (0_u32...target.height).each do |y|
       (0_u32...target.width).each do |x|
@@ -23,7 +23,7 @@ module Shale::TestDrawing
   # enabled, it will be rather slow, but building with `--release` tends to
   # show significant speedup.
   #
-  def test_static_colour(target : Shale::FrameBuffer)
+  def test_static_colour(target : Shale::Surface)
     (0_u32...target.height).each do |y|
       (0_u32...target.width).each do |x|
         b, g, r = Random.rand(StaticArray(UInt8, 3))
@@ -40,7 +40,7 @@ module Shale::TestDrawing
   # randomized colours for each pixel, and the other 3 areas will have
   # gradients based on the xy coordinates.
   #
-  def test_true_colour(target : Shale::FrameBuffer)
+  def test_true_colour(target : Shale::Surface)
     mid_v = target.height / 2
     mid_x = target.width / 2
 
