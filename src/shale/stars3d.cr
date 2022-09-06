@@ -36,6 +36,7 @@ module Shale
       half_width = target.width / 2
       half_height = target.height / 2
 
+      # TODO make general function for getting field of view and it's half value for angle calculations
       rad = (90/2)*(Math::PI/180) # deg to rad
       half_fov = Math.tan rad
 

@@ -71,6 +71,7 @@ module Shale
 
       @frame_buffer = Surface.new @width, @height
 
+      # TODO look into using the MIT-SHM extension, could be a potential speed-up/reduce latency for drawing
       @frame = @display.create_image(
         visual: @visual,
         depth: @default_depth.to_u32,
