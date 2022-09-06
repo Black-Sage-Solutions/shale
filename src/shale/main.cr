@@ -24,9 +24,9 @@ module Shale
 
     ctx = Shale::RenderCtx.new 600_u32
 
-    a : Shale::Vertex = {x: 100_f32, y: 100_f32}
-    b : Shale::Vertex = {x: 300_f32, y: 200_f32}
-    c : Shale::Vertex = {x: 80_f32, y: 300_f32}
+    a = Shale::Vector4[100_f32, 100_f32, 0_f32, 1_f32]
+    b = Shale::Vector4[300_f32, 200_f32, 0_f32, 1_f32]
+    c = Shale::Vector4[80_f32, 300_f32, 0_f32, 1_f32]
 
     prev_time = Time.monotonic
     stats = Stats.new

@@ -16,7 +16,7 @@ module Shale
       end
     end
 
-    def draw_triangle(*vertices : Shale::Vertex, target : Shale::Surface)
+    def draw_triangle(*vertices : Shale::Vector4, target : Shale::Surface)
       case vertices.size
       when .> 3
         raise "Too many vertices: (#{vertices.size})"
@@ -26,31 +26,31 @@ module Shale
 
       # In the video, the sorting happens manaully, checking each point individually and mapping to a respective var name,
       # i'm wondering if it's much faster than just doing a simple sort of an array
-      min, mid, max = vertices.to_a.sort { |a, b| a[:y] <=> b[:y] }
+      min, mid, max = vertices.to_a.sort { |a, b| a.y <=> b.y }
 
       area = Shale.triangle_area min, max, mid
       handedness = area >= 0 ? 1 : 0
 
       self.scan_to_triangle min, mid, max, handedness
-      self.draw target, min[:y].to_u32, max[:y].to_u32
+      self.draw target, min.y.to_u32, max.y.to_u32
     end
 
-    def scan_to_triangle(min : Shale::Vertex, mid : Shale::Vertex, max : Shale::Vertex, which_hand : Int32)
+    def scan_to_triangle(min : Shale::Vector4, mid : Shale::Vector4, max : Shale::Vector4, which_hand : Int32)
       self.scan_to_line min, max, 0 + which_hand
       self.scan_to_line min, mid, 1 - which_hand
       self.scan_to_line mid, max, 1 - which_hand
     end
 
-    def scan_to_line(min : Shale::Vertex, max : Shale::Vertex, which_hand : Int32)
-      x_dist = max[:x] - min[:x]
-      y_dist = max[:y] - min[:y]
+    def scan_to_line(min : Shale::Vector4, max : Shale::Vector4, which_hand : Int32)
+      x_dist = max.x - min.x
+      y_dist = max.y - min.y
 
       return if y_dist.to_i <= 0
 
       x_step = x_dist / y_dist
-      current_x = min[:x]
+      current_x = min.x
 
-      (min[:y].to_u32...max[:y].to_u32).each do |y|
+      (min.y.to_u32...max.y.to_u32).each do |y|
         @data[y * 2 + which_hand] = current_x.to_u32
         current_x += x_step
       end
