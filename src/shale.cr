@@ -1,7 +1,7 @@
 require "./shale/*"
 
 module Shale
-  VERSION = "2022.7"
+  VERSION = "2022.9"
 end
 
 # FIXME, This causes an error with invalid memory access, not sure why exactly
