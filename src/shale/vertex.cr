@@ -1,16 +1,16 @@
 module Shale
   alias Vertex = {x: Float32, y: Float32}
 
-  # TODO move somewhere more appropriate
-  # apparently this is a bad name, but also in the video the refactor is also a bad name
-  # need to thing of better name
-  def self.triangle_area(*vertices : Vector4) : Float32
-    case vertices.size
-    when .> 3
-      raise "Too many vertices: (#{vertices.size})"
-    when .< 3
-      raise "Too few vertices: (#{vertices.size})"
-    end
+  def self.parallelogram_area(*vertices : Vector4) : Float32
+    # condition was for when it was thought to be for a triangle when the
+    # following logic is the area for a parallelogram
+    #
+    # case vertices.size
+    # when .> 3
+    #   raise "Too many vertices: (#{vertices.size})"
+    # when .< 3
+    #   raise "Too few vertices: (#{vertices.size})"
+    # end
 
     a, b, c = vertices
 

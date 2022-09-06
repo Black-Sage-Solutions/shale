@@ -28,7 +28,10 @@ module Shale
       # i'm wondering if it's much faster than just doing a simple sort of an array
       min, mid, max = vertices.to_a.sort { |a, b| a.y <=> b.y }
 
-      area = Shale.triangle_area min, max, mid
+      # For now, from the video series, using the calculation to just find the area for the given vertices to
+      # decide what the handedness should be, eventhou the area value isn't correct here for a triangle (the actual
+      # area would be half of the return amount)
+      area = Shale.parallelogram_area min, max, mid
       handedness = area >= 0 ? 1 : 0
 
       self.scan_to_triangle min, mid, max, handedness
