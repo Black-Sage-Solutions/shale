@@ -110,7 +110,7 @@ module Shale
     end
 
     # Consider just taking in a Shale::Vector4?
-    def rotation(x, y, z) : self
+    def rotation(x : Number, y : Number, z : Number) : self
       # since there's only a few spots, maybe to save a few ops, to just identity
       # here manually
       rx = Matrix4(Float32).new.identity
