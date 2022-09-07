@@ -1,4 +1,6 @@
-module Shale::Math
+require "math"
+
+module Shale::Maths
   def self.parallelogram_area(*vertices : Vertex) : Float32
     # condition was for when it was thought to be for a triangle when the
     # following logic is the area for a parallelogram
@@ -22,5 +24,9 @@ module Shale::Math
 
   def self.tirangle_area(*vertices : Vertex) : Float32
     0.5 * parallelogram_area(*vertices)
+  end
+
+  def self.to_rad(deg : Number) : Float32
+    deg * (Math::PI / 180)
   end
 end
