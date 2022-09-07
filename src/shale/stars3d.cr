@@ -36,7 +36,7 @@ module Shale
       half_width = target.width / 2
       half_height = target.height / 2
 
-      half_fov = Math.tan Shale::Maths.to_rad(90 / 2)
+      half_fov = Math.tan(Shale::Maths.to_rad(90) / 2)
 
       (0...@num_of_stars).each do |i|
         @stars_z[i] -= delta * @speed

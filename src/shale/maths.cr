@@ -26,7 +26,7 @@ module Shale::Maths
     0.5 * parallelogram_area(*vertices)
   end
 
-  def self.to_rad(deg : Number) : Float32
+  def self.to_rad(deg : Number) : Float
     deg * (Math::PI / 180)
   end
 end
