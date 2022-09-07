@@ -54,6 +54,8 @@ module Shale
           end
         when X11::ConfigureEvent
           d.resize e.width.to_u32, e.height.to_u32
+          ctx = Shale::RenderCtx.new e.width, e.height
+          projection = Shale::Matrix4(Float32).new.perspective FOV, (e.width / e.height).to_f32, 0.1, 1000_f32
           break
         when X11::KeyEvent
           pp e.lookup_string
