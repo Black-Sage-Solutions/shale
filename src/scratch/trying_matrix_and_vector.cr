@@ -1,5 +1,5 @@
-require "./shale/matrix"
-require "./shale/vector"
+require "../shale/matrix"
+require "../shale/vector"
 
 # struct Vector(T, N)
 #   include Comparable(Vector)
@@ -78,14 +78,12 @@ def main
   # test2 = Vector[8_f32, 16_f32]
   # pp test2
 
-  test3 = Shale::Vector4[1_f32, 2_f32, 3_f32, 1_f32]
-  pp test3
-  pp test3 + Shale::Vector4[5_f32, 5_f32, 10_f32, 0_f32]
-  pp test3
+  # test3 = Shale::Vector4[1_f32, 2_f32, 3_f32, 1_f32]
+  # pp test3
+  # pp test3 + Shale::Vector4[5_f32, 5_f32, 10_f32, 0_f32]
+  # pp test3
 
-  test4 = Shale::Matrix4(Float32).new
-  test4[0] = 1_f32
-
+  test4 = Shale::Matrix4(Float32).new.ss_transform 250.0, 225.0
   pp test4
 end
 

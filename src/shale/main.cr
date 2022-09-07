@@ -15,18 +15,25 @@ module Shale
     end
   end
 
+  WIDTH  = 800_u32
+  HEIGHT = 600_u32
+  FOV    =  70_f32
+
   def self.main
     puts "Starting..."
 
-    d = Shale::Display.new(width: 800_u32, height: 600_u32, title: "Shale")
+    d = Shale::Display.new(width: WIDTH, height: HEIGHT, title: "Shale")
     pp d
     # stars = Shale::Stars3D.new 4096, 60_f32, 5_f32
 
-    ctx = Shale::RenderCtx.new 600_u32
+    ctx = Shale::RenderCtx.new WIDTH.to_i, HEIGHT.to_i
 
-    a = Shale::Vector4[100_f32, 100_f32, 0_f32, 1_f32]
-    b = Shale::Vector4[300_f32, 200_f32, 0_f32, 1_f32]
-    c = Shale::Vector4[80_f32, 300_f32, 0_f32, 1_f32]
+    a = Shale::Vertex.new -1.0, -1.0, 0.0
+    b = Shale::Vertex.new 0.0, 1.0, 0.0
+    c = Shale::Vertex.new 1.0, -1.0, 0.0
+
+    projection = Shale::Matrix4(Float32).new.perspective FOV, (WIDTH / HEIGHT).to_f32, 0.1, 1000_f32
+    rotation_count = 0_f32
 
     prev_time = Time.monotonic
     stats = Stats.new
@@ -66,7 +73,13 @@ module Shale
           # stars.render target: frame, delta: delta
           # ctx.scan_to_triangle a, b, c, 0
           # ctx.draw frame, 100_u32, 300_u32
-          ctx.draw_triangle c, a, b, target: frame
+          #
+          rotation_count += delta * 75
+          translation = Shale::Matrix4(Float32).new.identity.translation 0_f32, 0_f32, 5_f32
+          rotation = Shale::Matrix4(Float32).new.rotation 0_f32, rotation_count, 0_f32
+          transform = projection * translation * rotation
+
+          ctx.draw_triangle c.transform(transform), b.transform(transform), a.transform(transform), target: frame
         end
       end
 
