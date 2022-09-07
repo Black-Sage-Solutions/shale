@@ -6,7 +6,6 @@ module Shale
   # ### Description
   #
   # FIXES:
-  #
   # * Figure out the best flow for the data setting and method operations
   # * Not sure about the efficency of the value setting, like with #identity,
   #   then doing out of order changes to other indices, what if, at all,
@@ -34,6 +33,10 @@ module Shale
     protected property data
     @data = StaticArray(T, POINTS).new T.zero
 
+    # Multipy matrices
+    #
+    # ### Description
+    #
     def *(other : Matrix4(T)) : self
       mat = Matrix4(T).new
 
@@ -64,7 +67,7 @@ module Shale
       value
     end
 
-    # Setting @data points (not sure of the significance thou)
+    # Identity will set @data points
     #
     # ### Description
     #
@@ -81,9 +84,13 @@ module Shale
 
     def inspect(io : IO) : Nil
       io << {{@type}}
-      io << "([#{@data.join(", ")}])"
+      io << "([" << @data.join(", ") << "])"
     end
 
+    # Perspective proc
+    #
+    # ### Description
+    #
     def perspective(fov : Float32, aspect_ratio : Float32, z_near : Float32, z_far : Float32) : self
       tan_half_fov = Math.tan(Shale::Maths.to_rad(fov) / 2)
 
@@ -170,7 +177,7 @@ module Shale
       POINTS
     end
 
-    # Screen Space Transform
+    # Screen Space Transform proc
     #
     # ### Description
     #
@@ -182,6 +189,10 @@ module Shale
       self
     end
 
+    # Transform matrix with a vector
+    #
+    # ### Description
+    #
     def transform(other : Vector4) : Vector4
       Vector4[
         @data[0] * other.x + @data[1] * other.y + @data[2] * other.z + @data[3] * other.w,
@@ -191,7 +202,10 @@ module Shale
       ]
     end
 
-    # Consider just taking in a Shale::Vector4?
+    # Translation proc
+    #
+    # ### Description
+    #
     def translation(x : T, y : T, z : T) : self
       @data[3] = x
       @data[7] = y
