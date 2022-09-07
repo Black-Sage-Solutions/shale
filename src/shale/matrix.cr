@@ -31,6 +31,7 @@ module Shale
     # it comes to doing mutability with the data.
     # @data = StaticArray(StaticArray(T, 4), 4).new StaticArray(T, 4).new T.zero
 
+    protected property data
     @data = StaticArray(T, POINTS).new T.zero
 
     def *(other : Matrix4(T)) : self
@@ -93,7 +94,6 @@ module Shale
       @data[10] = (-z_near - z_far) / z_range
       @data[11] = 2 * z_far * z_near / z_range # not sure if order of ops is a problem here? (with z_near / z_range probably being first, not sure if intensional)
       @data[14] = 1_f32
-
       self
     end
 
@@ -144,7 +144,8 @@ module Shale
       rz[4] = z_sin
       rz[5] = z_cos
 
-      rz * ry * rx
+      @data = (rz * ry * rx).data
+      self
     end
 
     # Consider just taking in a Shale::Vector4?
@@ -152,6 +153,7 @@ module Shale
       @data[0] = x
       @data[5] = y
       @data[10] = z
+      self
     end
 
     def size
