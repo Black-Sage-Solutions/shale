@@ -1,22 +1,37 @@
 module Shale
-  alias Vertex = {x: Float32, y: Float32}
+  struct Vertex
+    @pos : Vector4(Float32)
 
-  def self.parallelogram_area(*vertices : Vector4) : Float32
-    # condition was for when it was thought to be for a triangle when the
-    # following logic is the area for a parallelogram
-    #
-    # case vertices.size
-    # when .> 3
-    #   raise "Too many vertices: (#{vertices.size})"
-    # when .< 3
-    #   raise "Too few vertices: (#{vertices.size})"
-    # end
+    def initialize(x : Float32, y : Float32, z : Float32)
+      @pos = Vector4[x, y, z, 1_f32]
+    end
 
-    a, b, c = vertices
+    def initialize(value : Vector4(Float32))
+      @pos = value
+    end
 
-    x1, y1 = b.x - a.x, b.y - a.y
-    x2, y2 = c.x - a.x, c.y - a.y
+    def perspec_divide : self
+      Vertex.new Vector4[@pos.x / @pos.w, @pos.y / @pos.w, @pos.z / @pos.w, @pos.w]
+    end
 
-    x1 * y2 - x2 * y1
+    def transform(m : Matrix4(Float32)) : self
+      Vertex.new m.transform(@pos)
+    end
+
+    def w : Float32
+      @pos.w
+    end
+
+    def x : Float32
+      @pos.x
+    end
+
+    def y : Float32
+      @pos.y
+    end
+
+    def z : Float32
+      @pos.z
+    end
   end
 end
