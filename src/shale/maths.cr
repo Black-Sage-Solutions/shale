@@ -1,7 +1,7 @@
 require "math"
 
 module Shale::Maths
-  def self.parallelogram_area(*vertices : Vertex) : Float32
+  def self.parallelogram_area(*vertices : Vertex) : Float
     # condition was for when it was thought to be for a triangle when the
     # following logic is the area for a parallelogram
     #
@@ -22,7 +22,7 @@ module Shale::Maths
     x1 * y2 - x2 * y1
   end
 
-  def self.tirangle_area(*vertices : Vertex) : Float32
+  def self.tirangle_area(*vertices : Vertex) : Float
     0.5 * parallelogram_area(*vertices)
   end
 
