@@ -109,13 +109,14 @@ module Shale
       pp.text "])"
     end
 
-    # Consider just taking in a Shale::Vector4?
+    # Rotation proc
+    #
+    # ### Description
+    #
     def rotation(x : Number, y : Number, z : Number) : self
-      # since there's only a few spots, maybe to save a few ops, to just identity
-      # here manually
-      rx = Matrix4(Float32).new.identity
-      ry = Matrix4(Float32).new.identity
-      rz = Matrix4(Float32).new.identity
+      rx = Matrix4(Float32).new
+      ry = Matrix4(Float32).new
+      rz = Matrix4(Float32).new
 
       x_rad = Shale::Maths.to_rad(x)
       y_rad = Shale::Maths.to_rad(y)
@@ -129,26 +130,35 @@ module Shale
       y_sin = Math.sin y_rad
       z_sin = Math.sin z_rad
 
+      rx[0] = T.new 1
       rx[5] = x_cos
       rx[6] = -x_sin
       rx[9] = x_sin
       rx[10] = x_cos
+      rx[15] = T.new 1
 
       ry[0] = y_cos
       ry[2] = -y_sin
+      ry[5] = T.new 1
       ry[8] = y_sin
       ry[10] = y_cos
+      ry[15] = T.new 1
 
       rz[0] = z_cos
       rz[1] = -z_sin
       rz[4] = z_sin
       rz[5] = z_cos
+      rz[10] = T.new 1
+      rz[15] = T.new 1
 
       @data = (rz * ry * rx).data
       self
     end
 
-    # Consider just taking in a Shale::Vector4?
+    # Scale proc
+    #
+    # ### Description
+    #
     def scale(x : T, y : T, z : T) : self
       @data[0] = x
       @data[5] = y
