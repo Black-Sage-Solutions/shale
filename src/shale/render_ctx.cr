@@ -48,26 +48,26 @@ module Shale
       handedness = area >= 0 ? 1 : 0
 
       self.scan_to_triangle min, mid, max, handedness
-      self.draw target, min.y.to_u32, max.y.to_u32
+      self.draw target, min.y.ceil.to_u32, max.y.ceil.to_u32
     end
 
-    def scan_to_triangle(min : Shale::Vertex, mid : Shale::Vertex, max : Shale::Vertex, which_hand : Int32)
+    def scan_to_triangle(min : Shale::Vertex, mid : Shale::Vertex, max : Shale::Vertex, which_hand : Int)
       self.scan_to_line min, max, 0 + which_hand
       self.scan_to_line min, mid, 1 - which_hand
       self.scan_to_line mid, max, 1 - which_hand
     end
 
-    def scan_to_line(min : Shale::Vertex, max : Shale::Vertex, which_hand : Int32)
+    def scan_to_line(min : Shale::Vertex, max : Shale::Vertex, which_hand : Int)
       x_dist = max.x - min.x
       y_dist = max.y - min.y
 
-      return if y_dist.to_i <= 0
+      return if y_dist <= 0
 
       x_step = x_dist / y_dist
-      current_x = min.x
+      current_x = min.x + (min.y.ceil.to_i - min.y) * x_step
 
-      (min.y.to_u32...max.y.to_u32).each do |y|
-        @data[y * 2 + which_hand] = current_x.to_u32
+      (min.y.ceil.to_u32...max.y.ceil.to_u32).each do |y|
+        @data[y * 2 + which_hand] = current_x.ceil.to_u32
         current_x += x_step
       end
     end
