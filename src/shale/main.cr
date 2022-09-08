@@ -24,9 +24,10 @@ module Shale
 
     d = Shale::Display.new(width: WIDTH, height: HEIGHT, title: "Shale")
     pp d
-    # stars = Shale::Stars3D.new 4096, 60_f32, 5_f32
 
-    ctx = Shale::RenderCtx.new WIDTH.to_i, HEIGHT.to_i
+    stars = Shale::Stars3D.new 4096, 60_f32, 5_f32
+
+    ctx = Shale::RenderCtx.new WIDTH.to_i, HEIGHT.to_i, d.frame_buffer
 
     a = Shale::Vertex.new -1.0, -1.0, 0.0
     b = Shale::Vertex.new 0.0, 1.0, 0.0
@@ -54,7 +55,7 @@ module Shale
           end
         when X11::ConfigureEvent
           d.resize e.width.to_u32, e.height.to_u32
-          ctx = Shale::RenderCtx.new e.width, e.height
+          ctx = Shale::RenderCtx.new e.width, e.height, d.frame_buffer
           projection = Shale::Matrix4(Float32).new.perspective FOV, (e.width / e.height).to_f32, 0.1, 1000_f32
           break
         when X11::KeyEvent
@@ -71,18 +72,20 @@ module Shale
       break if quit
 
       results = Benchmark.measure "Draw Time" do
-        d.draw do |frame|
-          # stars.render target: frame, delta: delta
-          # ctx.scan_to_triangle a, b, c, 0
-          # ctx.draw frame, 100_u32, 300_u32
-          #
-          rotation_count += delta * 75
-          translation = Shale::Matrix4(Float32).new.identity.translation 0_f32, 0_f32, 5_f32
-          rotation = Shale::Matrix4(Float32).new.rotation 0_f32, rotation_count, 0_f32
-          transform = projection * translation * rotation
+        rotation_count += delta * 75
+        translation = Shale::Matrix4(Float32).new.identity.translation 0_f32, 0_f32, 5_f32
+        rotation = Shale::Matrix4(Float32).new.rotation 0_f32, rotation_count, 0_f32
+        transform = projection * (translation * rotation)
 
-          ctx.draw_triangle c.transform(transform), b.transform(transform), a.transform(transform), target: frame
-        end
+        d.clear
+
+        # stars.render target: d.frame_buffer, delta: delta
+        # ctx.scan_to_triangle a, b, c, 0
+        # ctx.draw frame, 100_u32, 300_u32
+        #
+        ctx.draw_triangle c.transform(transform), b.transform(transform), a.transform(transform)
+
+        d.swap_buffer
       end
 
       stats.cycles += 1

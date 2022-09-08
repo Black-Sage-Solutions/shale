@@ -8,10 +8,10 @@ module Shale
     @default_gc : X11::C::X::GC
     @display : X11::Display
     @frame : X11::Image
-    @frame_buffer : Shale::Surface
     @visual : X11::Visual
     @window : X11::C::Window
 
+    getter frame_buffer : Shale::Surface
     getter wm_delete_window : X11::C::Atom
 
     # Create a display
@@ -83,6 +83,10 @@ module Shale
         bitmap_pad: 32,
         bytes_per_line: (@width * sizeof(UInt32)).to_i32, # Consider creating a color type
       )
+    end
+
+    def clear
+      @frame_buffer.clear
     end
 
     # Close and clean up the X11 display
