@@ -29,9 +29,9 @@ module Shale
 
     ctx = Shale::RenderCtx.new WIDTH.to_i, HEIGHT.to_i, d.frame_buffer
 
-    a = Shale::Vertex.new -1.0, -1.0, 0.0
-    b = Shale::Vertex.new 0.0, 1.0, 0.0
-    c = Shale::Vertex.new 1.0, -1.0, 0.0
+    a = Shale::Vertex.new Vector4[-1_f32, -1_f32, 0_f32, 1_f32], Vector4[1_f32, 0_f32, 0_f32, 0_f32]
+    b = Shale::Vertex.new Vector4[0_f32, 1_f32, 0_f32, 1_f32], Vector4[0_f32, 1_f32, 0_f32, 0_f32]
+    c = Shale::Vertex.new Vector4[1_f32, -1_f32, 0_f32, 1_f32], Vector4[0_f32, 0_f32, 1_f32, 0_f32]
 
     projection = Shale::Matrix4(Float32).new.perspective FOV, (WIDTH / HEIGHT).to_f32, 0.1, 1000_f32
     rotation_count = 0_f32
@@ -73,7 +73,7 @@ module Shale
 
       results = Benchmark.measure "Draw Time" do
         rotation_count += delta * 75
-        translation = Shale::Matrix4(Float32).new.identity.translation 0_f32, 0_f32, 5_f32
+        translation = Shale::Matrix4(Float32).new.identity.translation 0_f32, 0_f32, 3_f32
         rotation = Shale::Matrix4(Float32).new.rotation 0_f32, rotation_count, 0_f32
         transform = projection * (translation * rotation)
 
