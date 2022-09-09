@@ -1,7 +1,5 @@
 require "x11"
 
-require "./surface"
-
 module Shale
   class Display
     @default_depth : Int32
@@ -121,10 +119,6 @@ module Shale
 
     def flush
       @display.flush
-    end
-
-    def inspect(io : IO) : Nil
-      io << "#<Display @frame_buffer=#{@frame_buffer} >"
     end
 
     def next_event

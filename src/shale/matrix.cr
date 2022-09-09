@@ -31,6 +31,8 @@ module Shale
     # @data = StaticArray(StaticArray(T, 4), 4).new StaticArray(T, 4).new T.zero
 
     protected property data
+
+    # Doing the buffer init at compile time (i think that's what happens here)
     @data = StaticArray(T, POINTS).new T.zero
 
     # Multipy matrices

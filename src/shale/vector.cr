@@ -54,31 +54,28 @@ module Shale
       Vector4[@x.abs, @y.abs, @z.abs, @w.abs]
     end
 
-    # Would and when this overflow?
     def cross(other : self) : self
       _x = @y * other.z - z * other.y
       _y = @z * other.x - x * other.z
       _z = @x * other.y - y * other.x
 
-      Vector4[_x, _y, _z, 0_f32]
+      # At this point not sure when these values would overflow
+      Vector4[_x.to_f32, _y.to_f32, _z.to_f32, 0_f32]
     end
 
-    # When would this overflow?
-    def dot(other : self) : Float32
-      @x * other.x + @y * other.y + @z * other.z
+    def dot(other : self) : Float
+      (@x * other.x) + (@y * other.y) + (@z * other.z)
     end
 
-    # When would this overflow?
-    def len : Float32
+    def len : Float
       Math.sqrt @x.abs2 + @y.abs2 + @z.abs2
     end
 
-    # wtf is this for?
     def lerp(other : self, factor : Float32) : self
-      other - self * factor + self
+      self * factor + self - other
     end
 
-    def max : Float32
+    def max : Float
       Math.max(Math.max(@x, y), Math.max(@z, @w))
     end
 
