@@ -134,9 +134,6 @@ module Shale
     # ### Description
     #
     #
-    # TODO: move into a new method, and also refactor init method to
-    # `uninitialize` the necessary properties.
-    #
     def resize(width : UInt32, height : UInt32)
       return unless @width != width || @height != height
 
@@ -166,6 +163,8 @@ module Shale
     # Writes the X11 image, mapped with the Surface data, to the window for
     # display.
     #
+    # Note: the CPU usage of Xorg process also goes up, not sure what i would need to do
+    # to prevent that (if at all possible)
     #
     def swap_buffer
       @display.put_image(
@@ -183,6 +182,13 @@ module Shale
 
     def sync(discard : Bool)
       @display.sync discard
+    end
+
+    # Toggle the display for fullscreen or back to windowed mode
+    #
+    # ### Description
+    # TODO
+    def toggle_fullscreen
     end
   end
 end

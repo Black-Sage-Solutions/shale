@@ -1,9 +1,14 @@
 module Shale
   class Edge
-    @colour_step : Vector4(Float32)
+    # @colour_step : Vector4(Float32)
     @x_step : Float32
 
-    getter colour : Vector4(Float32)
+    getter tex_coords_x : Float32
+    getter tex_coords_x_step : Float32
+    getter tex_coords_y : Float32
+    getter tex_coords_y_step : Float32
+
+    # getter colour : Vector4(Float32)
     getter x : Float32
     getter y_end : UInt32
     getter y_start : UInt32
@@ -22,17 +27,33 @@ module Shale
 
       x_prestep = @x - min.x
 
-      @colour = (
-        gradient.colours[min_y_index] +
-        (gradient.colour_ystep * y_prestep) +
-        (gradient.colour_xstep * x_prestep)
+      # @colour = (
+      #   gradient.colours[min_y_index] +
+      #   (gradient.colour_ystep * y_prestep) +
+      #   (gradient.colour_xstep * x_prestep)
+      # )
+      # @colour_step = gradient.colour_ystep + (gradient.colour_xstep * @x_step)
+
+      @tex_coords_x = (
+        gradient.tex_coords_x[min_y_index] +
+        gradient.tex_coords_xx_step * x_prestep +
+        gradient.tex_coords_xy_step * y_prestep
       )
-      @colour_step = gradient.colour_ystep + (gradient.colour_xstep * @x_step)
+      @tex_coords_x_step = gradient.tex_coords_xy_step + gradient.tex_coords_xx_step * @x_step
+
+      @tex_coords_y = (
+        gradient.tex_coords_y[min_y_index] +
+        gradient.tex_coords_yx_step * x_prestep +
+        gradient.tex_coords_yy_step * y_prestep
+      )
+      @tex_coords_y_step = gradient.tex_coords_yy_step + gradient.tex_coords_yx_step * @x_step
     end
 
     def step : self
       @x += @x_step
-      @colour = @colour + @colour_step
+      # @colour += @colour_step
+      @tex_coords_x += @tex_coords_x_step
+      @tex_coords_y += @tex_coords_y_step
       self
     end
   end

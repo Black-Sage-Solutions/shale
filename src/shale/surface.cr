@@ -1,5 +1,6 @@
 module Shale
   struct Surface
+    getter channels
     getter data : Bytes
     getter height
     getter width
@@ -49,6 +50,18 @@ module Shale
     #
     def clear(shade : UInt8 = 0)
       @data.fill shade
+    end
+
+    # quick and dirty way to copy value from slice to slice, trying to get it
+    # working first from what's coded in the video, then i will look up another way that maybe better from the crystal docs
+    def copy_pixel(dest_x, dest_y, src_x, src_y, src : Surface)
+      dest_i = (dest_x + dest_y * @width) * @channels
+      src_i = (src_x + src_y * src.width) * src.channels
+
+      @data.unsafe_put(dest_i, src.data.unsafe_fetch(src_i))         # b
+      @data.unsafe_put(dest_i + 1, src.data.unsafe_fetch(src_i + 1)) # g
+      @data.unsafe_put(dest_i + 2, src.data.unsafe_fetch(src_i + 2)) # r
+      @data.unsafe_put(dest_i + 3, src.data.unsafe_fetch(src_i + 3)) # a
     end
 
     # Map pixel to the surface

@@ -29,9 +29,18 @@ module Shale
 
     ctx = Shale::RenderCtx.new WIDTH.to_i, HEIGHT.to_i, d.frame_buffer
 
-    a = Shale::Vertex.new Vector4[-1_f32, -1_f32, 0_f32, 1_f32], Vector4[1_f32, 0_f32, 0_f32, 0_f32]
-    b = Shale::Vertex.new Vector4[0_f32, 1_f32, 0_f32, 1_f32], Vector4[0_f32, 1_f32, 0_f32, 0_f32]
-    c = Shale::Vertex.new Vector4[1_f32, -1_f32, 0_f32, 1_f32], Vector4[0_f32, 0_f32, 1_f32, 0_f32]
+    a = Shale::Vertex.new Vector4[-1_f32, -1_f32, 0_f32, 1_f32], colour: Vector4[1_f32, 0_f32, 0_f32, 0_f32], tex_coords: Vector4[0_f32, 0_f32, 0_f32, 0_f32]
+    b = Shale::Vertex.new Vector4[0_f32, 1_f32, 0_f32, 1_f32], colour: Vector4[0_f32, 1_f32, 0_f32, 0_f32], tex_coords: Vector4[0.5_f32, 1_f32, 0_f32, 0_f32]
+    c = Shale::Vertex.new Vector4[1_f32, -1_f32, 0_f32, 1_f32], colour: Vector4[0_f32, 0_f32, 1_f32, 0_f32], tex_coords: Vector4[1_f32, 0_f32, 0_f32, 0_f32]
+
+    texture = Shale::Surface.new 32, 32
+
+    texture.height.times do |y|
+      texture.width.times do |x|
+        bl, gr, re, al = Random.rand(StaticArray(UInt8, 4))
+        texture.map_pixel x, y, bl, gr, re, al
+      end
+    end
 
     projection = Shale::Matrix4(Float32).new.perspective FOV, (WIDTH / HEIGHT).to_f32, 0.1, 1000_f32
     rotation_count = 0_f32
@@ -83,7 +92,7 @@ module Shale
         # ctx.scan_to_triangle a, b, c, 0
         # ctx.draw frame, 100_u32, 300_u32
         #
-        ctx.draw_triangle c.transform(transform), b.transform(transform), a.transform(transform)
+        ctx.draw_triangle c.transform(transform), b.transform(transform), a.transform(transform), texture: texture
 
         d.swap_buffer
       end
