@@ -83,9 +83,8 @@ module Shale
       )
     end
 
-    def clear
-      @frame_buffer.clear
-    end
+    delegate :close, :flush, :next_event, :pending, :sync, to: @display
+    delegate :clear, to: @frame_buffer
 
     # Close and clean up the X11 display
     #
@@ -93,9 +92,9 @@ module Shale
     # From the X11 documentation, this will also include other resources that
     # have been linked to the display (window, gfx context, pixmaps, etc).
     #
-    def close : Int32
-      @display.close
-    end
+    # def close : Int32
+    #   @display.close
+    # end
 
     # Draw to the Display's buffer
     #
@@ -115,18 +114,6 @@ module Shale
     #
     def finalize : Int32
       close
-    end
-
-    def flush
-      @display.flush
-    end
-
-    def next_event
-      @display.next_event
-    end
-
-    def pending
-      @display.pending
     end
 
     # Resize the drawing area
@@ -178,10 +165,6 @@ module Shale
         width: @width,
         height: @height,
       )
-    end
-
-    def sync(discard : Bool)
-      @display.sync discard
     end
 
     # Toggle the display for fullscreen or back to windowed mode
