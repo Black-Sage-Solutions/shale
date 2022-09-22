@@ -3,6 +3,8 @@ module Shale
     # @colour_step : Vector4(Float32)
     @x_step : Float32
 
+    getter one_over_z : Float32
+    getter one_over_z_step : Float32
     getter tex_coords_x : Float32
     getter tex_coords_x_step : Float32
     getter tex_coords_y : Float32
@@ -47,13 +49,22 @@ module Shale
         gradient.tex_coords_yy_step * y_prestep
       )
       @tex_coords_y_step = gradient.tex_coords_yy_step + gradient.tex_coords_yx_step * @x_step
+
+      # This is part of the linear equation for perspective mapping (1/z)
+      @one_over_z = (
+        gradient.one_over_z[min_y_index] +
+        gradient.one_over_zx_step * x_prestep +
+        gradient.one_over_zy_step * y_prestep
+      )
+      @one_over_z_step = gradient.one_over_zy_step + gradient.one_over_zx_step * @x_step
     end
 
     def step : self
-      @x += @x_step
       # @colour += @colour_step
+      @one_over_z += @one_over_z_step
       @tex_coords_x += @tex_coords_x_step
       @tex_coords_y += @tex_coords_y_step
+      @x += @x_step
       self
     end
   end

@@ -14,14 +14,22 @@ module Shale
     def initialize(@width : Int32, @height : Int32, @target : Shale::Surface)
     end
 
+    # FIXME, for the texture mapping, gradient is not needed, but still including for the colour part, for now
     def draw_scan_line(left : Shale::Edge, right : Shale::Edge, y : UInt32, gradient : Gradient, texture : Shale::Surface)
       x_min = left.x.ceil.to_u32
       x_max = right.x.ceil.to_u32
 
       x_prestep = x_min - left.x
 
-      tex_coords_x = left.tex_coords_x + (gradient.tex_coords_xx_step * x_prestep)
-      tex_coords_y = left.tex_coords_y + (gradient.tex_coords_yx_step * x_prestep)
+      x_dist = right.x - left.x
+
+      one_over_z_step = (right.one_over_z - left.one_over_z) / x_dist
+      tex_coords_xx_step = (right.tex_coords_x - left.tex_coords_x) / x_dist
+      tex_coords_yx_step = (right.tex_coords_y - left.tex_coords_y) / x_dist
+
+      one_over_z = left.one_over_z + one_over_z_step * x_prestep
+      tex_coords_x = left.tex_coords_x + tex_coords_xx_step * x_prestep
+      tex_coords_y = left.tex_coords_y + tex_coords_yx_step * x_prestep
 
       # colour = gradient.colour_xstep * x_prestep + left.colour
 
@@ -34,14 +42,15 @@ module Shale
         # b = (colour.z * 255 + 0.5).to_u8! # .floor.clamp(0, 255).to_u8
         # @target.map_pixel x, y, b, g, r, 0xff
         # colour = colour + gradient.colour_xstep
-
-        src_x = (tex_coords_x * (texture.width - 1) + 0.5_f32).to_i
-        src_y = (tex_coords_y * (texture.height - 1) + 0.5_f32).to_i
+        z = 1_f32 / one_over_z
+        src_x = ((tex_coords_x * z) * (texture.width - 1) + 0.5_f32).to_i
+        src_y = ((tex_coords_y * z) * (texture.height - 1) + 0.5_f32).to_i
 
         @target.copy_pixel x, y, src_x, src_y, texture
 
-        tex_coords_x += gradient.tex_coords_xx_step
-        tex_coords_y += gradient.tex_coords_yx_step
+        one_over_z += one_over_z_step
+        tex_coords_x += tex_coords_xx_step
+        tex_coords_y += tex_coords_yx_step
       end
     end
 

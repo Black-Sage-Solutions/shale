@@ -5,11 +5,6 @@ module Shale
     getter colour : Vector4(Float32)
     getter tex_coords : Vector4(Float32)
 
-    # maybe get rid of this one?
-    # def initialize(x : Float32, y : Float32, z : Float32, @colour : Vector4(Float32), @tex_coords : Vector4(Float32))
-    #   @pos = Vector4[x, y, z, 1_f32]
-    # end
-
     def initialize(@pos : Vector4(Float32), @colour : Vector4(Float32), @tex_coords : Vector4(Float32))
     end
 
