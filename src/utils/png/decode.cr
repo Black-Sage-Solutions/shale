@@ -18,42 +18,93 @@ module PNG
     TEXT = Bytes[0x74, 0x45, 0x58, 0x74]
   end
 
-  module Chunk
-    struct Type
-      @data : Bytes
+  enum ColourDepth
+    Greyscale           = 0
+    Truecolour          = 2
+    IndexedColour       = 3
+    GreyscaleWithAlpha  = 4
+    TruecolourWithAlpha = 6
+  end
 
-      def initialize(@data : Bytes)
-        raise "Chunk::Type#name must be 4 bytes long: #{data.size}" if @data.size != 4
-      end
+  module ChunkType
+    # def initialize(@pos : Int64, @len : UInt32, @type : Bytes, @data : Bytes?, @crc : Bytes)
+    #   raise "Chunk type bytes must be 4 bytes long: #{type.size}" if type.size != 4
+    # end
+    # def inspect(io : IO) : Nil
+    #   io << {{@type.name.id.stringify}} << '(' << name << ')'
+    # end
 
-      def name : String
-        String.new @data, encoding: "LATIN1"
-      end
+    abstract def type : Bytes
 
-      def inspect(io : IO) : Nil
-        io << {{@type.name.id.stringify}} << '(' << name << ')'
-      end
-
-      def critical? : Bool
-        @data[0].chr.ascii_uppercase
-      end
-
-      def public? : Bool
-        @data[1].chr.ascii_uppercase
-      end
-
-      def standard? : Bool
-        @data[2].chr.ascii_uppercase
-      end
-
-      def copy_safe? : Bool
-        @data[3].chr.ascii_lowercase
-      end
-
-      def to_unsafe : Pointer(Bytes)
-        pointerof(@data)
-      end
+    def name : String
+      String.new type, encoding: "LATIN1"
     end
+
+    def critical? : Bool
+      type[0].chr.ascii_uppercase?
+    end
+
+    def public? : Bool
+      type[1].chr.ascii_uppercase?
+    end
+
+    def standard? : Bool
+      type[2].chr.ascii_uppercase?
+    end
+
+    def copy_safe? : Bool
+      type[3].chr.ascii_lowercase?
+    end
+  end
+
+  class IHDR
+    include ChunkType
+
+    getter type : Bytes = Critical::IHDR
+
+    def initialize(@pos : Int64, @len : UInt32, @data : Bytes?)
+      raise "Chunk type bytes must be 4 bytes long: #{type.size}" if type.size != 4
+    end
+
+    def width : Int32
+      PNG_ENDIAN.decode Int32, @data[0..3]
+    end
+
+    def height : Int32
+      PNG_ENDIAN.decode Int32, @data[4..7]
+    end
+
+    def bit_depth : UInt8
+      @data[8]
+    end
+
+    def colour_type : ColourDepth
+      ColourDepth.new @data.not_nil!.[9]
+    end
+
+    def compress_meth : UInt8
+      @data[10]
+    end
+
+    def filter_meth : UInt8
+      @data[11]
+    end
+
+    def inter_meth : UInt8
+      @data[12]
+    end
+  end
+
+  class PNG
+    @data : Bytes
+
+    def initialize(@width : UInt32, @height : UInt32, @bit_depth : Int32)
+      @data = Bytes.new @width * @height * @bit_depth
+      @data.fill 0_u8
+    end
+  end
+
+  private def self.check_crc(checksum : Bytes, data : Bytes)
   end
 
   # Read a chunk of bytes from the incoming file/IO.
@@ -66,7 +117,7 @@ module PNG
   # ### Raises
   # If the length value is greater than the max value of `Int32`.
   #
-  private def self.read_chunk(img : IO, skip_data : Bool = false)
+  private def self.read_chunk(img : IO, skip_data : Bool = false) # : Chunk
     pos = img.pos
 
     buf = Bytes.new 4
@@ -75,7 +126,7 @@ module PNG
 
     buf = Bytes.new 4
     img.read buf
-    chunk_type = Chunk::Type.new buf
+    chunk_type = buf.dup
 
     # FIXME, will need to think about memory? thou Bytes.new (and bytes.dup)
     # i think are allocated in the heap?
@@ -107,33 +158,25 @@ module PNG
     raise "Missing PNG Signature" if signature.nil?
     raise "Incorrect PNG Signature" if PNG_ENDIAN.decode(UInt64, signature) != SIG
 
-    chunks = Array(Tuple(Int64, UInt32, Chunk::Type, Bytes?, Bytes)).new
+    # chunks = [] of Chunk
+    chunks = Array(Tuple(Int64, UInt32, Bytes, Bytes?, Bytes)).new
 
     while img.peek.not_nil!.empty?.!
-      chunks << read_chunk img, skip_data: true
+      chunks << read_chunk img
     end
 
-    pp! chunks
+    ihdr = chunks.find! &.[2].== Critical::IHDR
 
-    # ihdr_chunk = read_chunk img
-    # pp! ihdr_chunk
+    phys = chunks.find &.[2].== Ancillary::PHYS
 
-    # phys_chunk = read_chunk img
-    # pp! phys_chunk
+    texts = chunks.select &.[2].== Ancillary::TEXT
 
-    # width = Bytes.new 4
-    # height = Bytes.new 4
-    # bit_depth = Bytes.new 1
-    # colour_type = Bytes.new 1
-    # compress_meth = Bytes.new 1
-    # filter_meth = Bytes.new 1
-    # inter_meth = Bytes.new 1
+    idats = chunks.select! &.[2].== Critical::IDAT
+
+    header = IHDR.new ihdr[0], ihdr[1], ihdr[3]
+
+    pp! header.colour_type, header.critical?
+
+    img.close
   end
-
-  # class PNG
-  #   @data : Bytes.new 0
-
-  #   def raw
-  #   end
-  # end
 end
