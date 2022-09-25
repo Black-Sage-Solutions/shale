@@ -5,6 +5,8 @@ Following `thebennybox`'s series: [https://www.youtube.com/playlist?list=PLEETnX
 
 This is a project for learning about general computer graphics and how it works without GPU acceleration. As well, learning to code in Crystal and how to use X11. In the future, would also be a good test bed to port over to Windows and MacOS and learn how to integrate into their display servers.
 
+![Example](./example.gif)
+
 ## Dependencies
 
 * Crystal `>=1.5.0`

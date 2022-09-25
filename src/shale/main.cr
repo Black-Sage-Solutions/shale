@@ -83,7 +83,7 @@ module Shale
       results = Benchmark.measure "Draw Time" do
         rotation_count += delta * 75
         translation = Shale::Matrix4(Float32).new.identity.translation 0_f32, 0_f32, 3_f32
-        rotation = Shale::Matrix4(Float32).new.rotation 0_f32, 0_f32, rotation_count
+        rotation = Shale::Matrix4(Float32).new.rotation 0_f32, rotation_count, 30_f32
         transform = projection * (translation * rotation)
 
         d.clear
