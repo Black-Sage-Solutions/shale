@@ -1,5 +1,5 @@
 # Shale
-Another software renderer, written in [Crystal](https://crystal-lang.org/)!
+A software renderer, written in [Crystal](https://crystal-lang.org/)!
 
 Following `thebennybox`'s series: [https://www.youtube.com/playlist?list=PLEETnX-uPtBUbVOok816vTl1K9vV1GgH5](https://www.youtube.com/playlist?list=PLEETnX-uPtBUbVOok816vTl1K9vV1GgH5)
 
@@ -24,6 +24,10 @@ Debain-base systems:
 With using the `shards` cmd, the `Shale` target will need to be specified. As well the `XUTIL_DEFINE_FUNCTIONS` will need to be included for the build:
 
 	shards run Shale --define=XUTIL_DEFINE_FUNCTIONS
+
+For performance, include the `--release` flag in the build/run cmd:
+
+	shards run Shale --release --define=XUTIL_DEFINE_FUNCTIONS
 
 ## License
 
